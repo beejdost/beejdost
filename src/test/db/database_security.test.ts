@@ -79,6 +79,7 @@ describe('Database Security & RLS Policy Suite (PostgreSQL 16+ via PGlite)', () 
       '20260216000003_rls_security_policies.sql',
       '20260216000004_storage_policies.sql',
       '20260216000005_seed_data.sql',
+      '20260216000007_marketplace_listings.sql',
     ];
 
     for (const file of files) {
@@ -310,6 +311,70 @@ describe('Database Security & RLS Policy Suite (PostgreSQL 16+ via PGlite)', () 
           );
         `)
       ).rejects.toThrow();
+    });
+
+    it('ENFORCES positive and bounded quantity constraint (<= 50,000 kg)', async () => {
+      await asUser(sellerAliceId);
+      // Exceeding 50,000 kg throws check constraint violation
+      await expect(
+        db.query(`
+          INSERT INTO public.listings (
+            seller_id, crop_id, variety_name, variety_type, seed_condition,
+            listing_type, quantity_kg, price_per_kg, harvest_year, province,
+            district, description, status
+          ) VALUES (
+            '${sellerAliceId}', '${cropId}', 'Too Much Seed', 'desi', 'raw',
+            'sale', 50001.00, 100.00, 2025, 'punjab',
+            'Gujranwala', 'Valid description with sufficient length.', 'active'
+          );
+        `)
+      ).rejects.toThrow(/chk_listing_quantity_bound/);
+    });
+
+    it('ENFORCES pricing policy constraint (sale requires price > 0, exchange forbids price)', async () => {
+      await asUser(sellerAliceId);
+      // Sale listing with 0 or null price should throw
+      await expect(
+        db.query(`
+          INSERT INTO public.listings (
+            seller_id, crop_id, variety_name, variety_type, seed_condition,
+            listing_type, quantity_kg, price_per_kg, harvest_year, province,
+            district, description, status
+          ) VALUES (
+            '${sellerAliceId}', '${cropId}', 'Sale No Price', 'desi', 'raw',
+            'sale', 10.00, 0, 2025, 'punjab',
+            'Gujranwala', 'Valid description with sufficient length.', 'active'
+          );
+        `)
+      ).rejects.toThrow(/chk_listing_pricing_policy/);
+    });
+
+    it('DENIES owner from un-suspending or un-rejecting their own listing', async () => {
+      // First, set listing to suspended as admin
+      await asUser(adminId, true);
+      await db.query(`
+        UPDATE public.listings
+        SET status = 'suspended'
+        WHERE id = '${aliceListingId}';
+      `);
+
+      // Alice tries to self-activate
+      await asUser(sellerAliceId);
+      await expect(
+        db.query(`
+          UPDATE public.listings
+          SET status = 'active'
+          WHERE id = '${aliceListingId}';
+        `)
+      ).rejects.toThrow(/Only administrators can reactivate suspended listings|cannot be activated without administrator review/);
+
+      // Restore active status as admin for subsequent tests
+      await asUser(adminId, true);
+      await db.query(`
+        UPDATE public.listings
+        SET status = 'active'
+        WHERE id = '${aliceListingId}';
+      `);
     });
   });
 
