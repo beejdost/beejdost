@@ -3,6 +3,7 @@ import { RouteObject } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { LoadingState } from '@/components/common/LoadingState';
 import { NotFound } from '@/components/common/NotFound';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 import { HomePage } from '@/features/home/HomePage';
 import { SearchPage } from '@/features/listings/SearchPage';
@@ -14,11 +15,20 @@ import { ProfilePage } from '@/features/profile/ProfilePage';
 import { AdminPage } from '@/features/admin/AdminPage';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { RegisterPage } from '@/features/auth/RegisterPage';
+import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage';
+import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
+import { AuthCallbackPage } from '@/features/auth/AuthCallbackPage';
+import { SuspendedAccountPage } from '@/features/auth/SuspendedAccountPage';
+import { AuthProvider } from '@/features/auth/AuthContext';
 
 export const routes: RouteObject[] = [
   {
     path: '/',
-    element: <AppLayout />,
+    element: (
+      <AuthProvider>
+        <AppLayout />
+      </AuthProvider>
+    ),
     children: [
       {
         index: true,
@@ -47,41 +57,51 @@ export const routes: RouteObject[] = [
       {
         path: 'listings/create',
         element: (
-          <Suspense fallback={<LoadingState fullPage />}>
-            <CreateListingPage />
-          </Suspense>
+          <ProtectedRoute>
+            <Suspense fallback={<LoadingState fullPage />}>
+              <CreateListingPage />
+            </Suspense>
+          </ProtectedRoute>
         ),
       },
       {
         path: 'my-listings',
         element: (
-          <Suspense fallback={<LoadingState fullPage />}>
-            <MyListingsPage />
-          </Suspense>
+          <ProtectedRoute>
+            <Suspense fallback={<LoadingState fullPage />}>
+              <MyListingsPage />
+            </Suspense>
+          </ProtectedRoute>
         ),
       },
       {
         path: 'messages',
         element: (
-          <Suspense fallback={<LoadingState fullPage />}>
-            <MessagesPage />
-          </Suspense>
+          <ProtectedRoute>
+            <Suspense fallback={<LoadingState fullPage />}>
+              <MessagesPage />
+            </Suspense>
+          </ProtectedRoute>
         ),
       },
       {
         path: 'profile',
         element: (
-          <Suspense fallback={<LoadingState fullPage />}>
-            <ProfilePage />
-          </Suspense>
+          <ProtectedRoute>
+            <Suspense fallback={<LoadingState fullPage />}>
+              <ProfilePage />
+            </Suspense>
+          </ProtectedRoute>
         ),
       },
       {
         path: 'admin',
         element: (
-          <Suspense fallback={<LoadingState fullPage />}>
-            <AdminPage />
-          </Suspense>
+          <ProtectedRoute requireAdmin>
+            <Suspense fallback={<LoadingState fullPage />}>
+              <AdminPage />
+            </Suspense>
+          </ProtectedRoute>
         ),
       },
       {
@@ -97,6 +117,38 @@ export const routes: RouteObject[] = [
         element: (
           <Suspense fallback={<LoadingState fullPage />}>
             <RegisterPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'forgot-password',
+        element: (
+          <Suspense fallback={<LoadingState fullPage />}>
+            <ForgotPasswordPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'reset-password',
+        element: (
+          <Suspense fallback={<LoadingState fullPage />}>
+            <ResetPasswordPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'auth/callback',
+        element: (
+          <Suspense fallback={<LoadingState fullPage />}>
+            <AuthCallbackPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'suspended',
+        element: (
+          <Suspense fallback={<LoadingState fullPage />}>
+            <SuspendedAccountPage />
           </Suspense>
         ),
       },

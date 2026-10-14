@@ -1,11 +1,21 @@
 import type { FC } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
-import { Sprout, PlusCircle, ShieldCheck } from 'lucide-react';
+import { useAuth } from '@/features/auth/AuthContext';
+import { Sprout, PlusCircle, ShieldCheck, User, LogOut, LogIn } from 'lucide-react';
 
 export const Header: FC = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { isAuthenticated, user, profile, isAdmin, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
+  const displayName = profile?.fullName || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Farmer';
 
   return (
     <header className="app-header">
@@ -92,48 +102,54 @@ export const Header: FC = () => {
             {t('nav.search')}
           </NavLink>
 
-          <NavLink
-            to="/my-listings"
-            style={({ isActive }) => ({
-              fontWeight: 600,
-              fontSize: '0.95rem',
-              color: isActive ? 'var(--primary-700)' : 'var(--text-secondary)',
-              borderBottom: isActive ? '2px solid var(--primary-700)' : '2px solid transparent',
-              paddingBottom: '4px',
-            })}
-          >
-            {t('nav.myListings')}
-          </NavLink>
+          {isAuthenticated && (
+            <>
+              <NavLink
+                to="/my-listings"
+                style={({ isActive }) => ({
+                  fontWeight: 600,
+                  fontSize: '0.95rem',
+                  color: isActive ? 'var(--primary-700)' : 'var(--text-secondary)',
+                  borderBottom: isActive ? '2px solid var(--primary-700)' : '2px solid transparent',
+                  paddingBottom: '4px',
+                })}
+              >
+                {t('nav.myListings')}
+              </NavLink>
 
-          <NavLink
-            to="/messages"
-            style={({ isActive }) => ({
-              fontWeight: 600,
-              fontSize: '0.95rem',
-              color: isActive ? 'var(--primary-700)' : 'var(--text-secondary)',
-              borderBottom: isActive ? '2px solid var(--primary-700)' : '2px solid transparent',
-              paddingBottom: '4px',
-            })}
-          >
-            {t('nav.messages')}
-          </NavLink>
+              <NavLink
+                to="/messages"
+                style={({ isActive }) => ({
+                  fontWeight: 600,
+                  fontSize: '0.95rem',
+                  color: isActive ? 'var(--primary-700)' : 'var(--text-secondary)',
+                  borderBottom: isActive ? '2px solid var(--primary-700)' : '2px solid transparent',
+                  paddingBottom: '4px',
+                })}
+              >
+                {t('nav.messages')}
+              </NavLink>
+            </>
+          )}
 
-          <NavLink
-            to="/admin"
-            style={({ isActive }) => ({
-              fontWeight: 600,
-              fontSize: '0.95rem',
-              color: isActive ? 'var(--primary-700)' : 'var(--text-secondary)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.3rem',
-              borderBottom: isActive ? '2px solid var(--primary-700)' : '2px solid transparent',
-              paddingBottom: '4px',
-            })}
-          >
-            <ShieldCheck size={16} aria-hidden="true" />
-            <span>{t('nav.admin')}</span>
-          </NavLink>
+          {isAdmin && (
+            <NavLink
+              to="/admin"
+              style={({ isActive }) => ({
+                fontWeight: 600,
+                fontSize: '0.95rem',
+                color: isActive ? 'var(--primary-700)' : 'var(--text-secondary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem',
+                borderBottom: isActive ? '2px solid var(--primary-700)' : '2px solid transparent',
+                paddingBottom: '4px',
+              })}
+            >
+              <ShieldCheck size={16} aria-hidden="true" />
+              <span>{t('nav.admin')}</span>
+            </NavLink>
+          )}
         </nav>
 
         {/* Right Action Bar */}
@@ -157,13 +173,71 @@ export const Header: FC = () => {
             className="desktop-auth"
             style={{ display: 'none', alignItems: 'center', gap: '0.5rem' }}
           >
-            <Link
-              to="/login"
-              className="btn btn-outline"
-              style={{ padding: '0.45rem 0.9rem', fontSize: '0.875rem' }}
-            >
-              {t('nav.login')}
-            </Link>
+            {isAuthenticated ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Link
+                  to="/profile"
+                  className="btn btn-outline"
+                  id="nav-profile-link"
+                  style={{
+                    padding: '0.45rem 0.9rem',
+                    fontSize: '0.875rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    maxWidth: '160px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                  title={displayName}
+                >
+                  <User size={16} aria-hidden="true" />
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{displayName}</span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="btn btn-outline"
+                  id="nav-logout-btn"
+                  style={{
+                    padding: '0.45rem 0.6rem',
+                    fontSize: '0.875rem',
+                    color: 'var(--text-muted)',
+                  }}
+                  title="Sign Out"
+                  aria-label="Sign Out"
+                >
+                  <LogOut size={16} aria-hidden="true" />
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Link
+                  to="/login"
+                  className="btn btn-outline"
+                  id="nav-login-link"
+                  style={{ padding: '0.45rem 0.9rem', fontSize: '0.875rem' }}
+                >
+                  <LogIn size={15} aria-hidden="true" />
+                  <span>{t('nav.login')}</span>
+                </Link>
+
+                <Link
+                  to="/register"
+                  className="btn btn-primary"
+                  id="nav-register-link"
+                  style={{
+                    padding: '0.45rem 0.9rem',
+                    fontSize: '0.875rem',
+                    backgroundColor: 'var(--primary-700)',
+                  }}
+                >
+                  <span>{t('auth.registerButton')}</span>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -22,4 +22,23 @@ if (typeof window !== 'undefined') {
     writable: true,
     value: () => {},
   });
+
+  // Fix for Node 22+ jsdom incompatibility with undici RequestInit.signal
+  if (typeof globalThis.Request !== 'undefined') {
+    const NativeRequest = globalThis.Request;
+    globalThis.Request = class PatchedRequest extends NativeRequest {
+      constructor(input: RequestInfo | URL, init?: RequestInit) {
+        try {
+          super(input, init);
+        } catch (err) {
+          if (init?.signal && err instanceof TypeError && String(err).includes('AbortSignal')) {
+            const { signal: _signal, ...rest } = init;
+            super(input, rest);
+          } else {
+            throw err;
+          }
+        }
+      }
+    };
+  }
 }

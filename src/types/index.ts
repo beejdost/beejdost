@@ -6,7 +6,7 @@ export type CropCategory =
   | 'vegetables'
   | 'fodder';
 
-export type VarietyType = 'heirloom' | 'hybrid' | 'organic';
+export type VarietyType = 'heirloom' | 'hybrid' | 'opv' | 'organic' | 'desi';
 
 export type PakistanProvince =
   | 'punjab'
@@ -14,7 +14,33 @@ export type PakistanProvince =
   | 'khyberPakhtunkhwa'
   | 'balochistan'
   | 'gilgitBaltistan'
-  | 'azadKashmir';
+  | 'azadKashmir'
+  | 'islamabad';
+
+export type FarmingType = 'organic' | 'conventional' | 'seedSaver' | 'researcher';
+
+export type PreferredLanguage = 'en' | 'ur' | 'pa';
+
+export interface UserProfile {
+  id: string;
+  fullName: string;
+  avatarUrl?: string | null;
+  phone?: string | null;
+  province: PakistanProvince;
+  district: string;
+  tehsil?: string | null;
+  village?: string | null;
+  farmingType: FarmingType;
+  preferredLanguage: PreferredLanguage;
+  isVerifiedKeeper: boolean;
+  isSuspended: boolean;
+  bio?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Backward compatibility alias
+export type FarmerProfile = UserProfile;
 
 export interface SeedListing {
   id: string;
@@ -33,16 +59,6 @@ export interface SeedListing {
   createdAt: string;
   imageUrl?: string;
   isVerifiedKeeper?: boolean;
-}
-
-export interface FarmerProfile {
-  id: string;
-  fullName: string;
-  phone: string;
-  district: string;
-  province: PakistanProvince;
-  farmingType: 'organic' | 'conventional' | 'seedSaver';
-  verifiedKeeper: boolean;
 }
 
 export interface ChatMessage {

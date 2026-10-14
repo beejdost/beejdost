@@ -40,42 +40,39 @@ describe('Route Rendering Tests', () => {
     expect(screen.getByText(/Kallar rice tract/i)).toBeInTheDocument();
   });
 
-  it('renders Create Listing page at /listings/create', async () => {
+  it('redirects unauthenticated user from /listings/create to /login', async () => {
     renderRoute('/listings/create');
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
-      /Offer New Seed Lot/i
+      /Sign In to Beej Dost/i
     );
-    expect(screen.getByRole('button', { name: /Publish Seed Lot/i })).toBeInTheDocument();
   });
 
-  it('renders My Listings page at /my-listings', async () => {
+  it('redirects unauthenticated user from /my-listings to /login', async () => {
     renderRoute('/my-listings');
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
-      /My Seed Offerings/i
+      /Sign In to Beej Dost/i
     );
   });
 
-  it('renders Messages page at /messages', async () => {
+  it('redirects unauthenticated user from /messages to /login', async () => {
     renderRoute('/messages');
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
-      /Seed Keeper Messages/i
+      /Sign In to Beej Dost/i
     );
   });
 
-  it('renders Profile page at /profile', async () => {
+  it('redirects unauthenticated user from /profile to /login', async () => {
     renderRoute('/profile');
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
-      /Farmer Profile/i
+      /Sign In to Beej Dost/i
     );
-    expect(screen.getByRole('button', { name: /Update Profile/i })).toBeInTheDocument();
   });
 
-  it('renders Admin page at /admin', async () => {
+  it('redirects unauthenticated user from /admin to /login', async () => {
     renderRoute('/admin');
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
-      /Platform Administration/i
+      /Sign In to Beej Dost/i
     );
-    expect(screen.getByText(/Operations Console/i)).toBeInTheDocument();
   });
 
   it('renders Login page at /login', async () => {
@@ -92,6 +89,22 @@ describe('Route Rendering Tests', () => {
       /Create Farmer Account/i
     );
     expect(screen.getByLabelText(/Confirm Password/i)).toBeInTheDocument();
+  });
+
+  it('renders Forgot Password page at /forgot-password', async () => {
+    renderRoute('/forgot-password');
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
+      /Reset Your Password/i
+    );
+    expect(screen.getByRole('button', { name: /Send Reset Link/i })).toBeInTheDocument();
+  });
+
+  it('renders Suspended Account page at /suspended', async () => {
+    renderRoute('/suspended');
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
+      /Account Suspended/i
+    );
+    expect(screen.getByText(/support@beejdost.pk/i)).toBeInTheDocument();
   });
 
   it('renders NotFound component for unknown routes', async () => {
