@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './AuthContext';
-import { isSupabaseConfigured } from '@/lib/supabase';
+import { isSupabaseConfigured, getSupabaseConfigError } from '@/lib/supabase';
 import { LogIn, AlertCircle, Info, MailWarning, RefreshCw, CheckCircle2 } from 'lucide-react';
 
 const loginSchema = z.object({
@@ -125,9 +125,13 @@ export const LoginPage: React.FC = () => {
           }}
         >
           <Info size={18} style={{ flexShrink: 0, marginTop: '2px' }} aria-hidden="true" />
-          <span>
-            Notice: Supabase credentials are not configured in <code>.env</code>. Connect live credentials for full authentication.
-          </span>
+          <div>
+            <strong>Configuration Notice:</strong>{' '}
+            {getSupabaseConfigError() || 'Supabase credentials are not configured in .env.'}
+            <div style={{ marginTop: '0.35rem', fontSize: '0.8rem', color: '#1e3a8a' }}>
+              Set <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> (or <code>VITE_SUPABASE_PUBLISHABLE_KEY</code>) in your root <code>.env</code> file, then restart Vite.
+            </div>
+          </div>
         </div>
       )}
 

@@ -5,8 +5,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './AuthContext';
+import { isSupabaseConfigured, getSupabaseConfigError } from '@/lib/supabase';
 import { PakistanProvince, PreferredLanguage } from '@/types';
-import { UserPlus, Mail, AlertCircle, CheckCircle2, RefreshCw } from 'lucide-react';
+import { UserPlus, Mail, AlertCircle, CheckCircle2, RefreshCw, Info } from 'lucide-react';
 
 const registerSchema = z
   .object({
@@ -223,6 +224,33 @@ export const RegisterPage: React.FC = () => {
           {t('auth.registerSubtitle')}
         </p>
       </div>
+
+      {!isSupabaseConfigured() && (
+        <div
+          role="note"
+          style={{
+            backgroundColor: '#eff6ff',
+            color: '#1e40af',
+            border: '1px solid #bfdbfe',
+            padding: '0.85rem 1rem',
+            borderRadius: 'var(--radius-md)',
+            marginBottom: '1.5rem',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '0.65rem',
+            fontSize: '0.85rem',
+          }}
+        >
+          <Info size={18} style={{ flexShrink: 0, marginTop: '2px' }} aria-hidden="true" />
+          <div>
+            <strong>Configuration Notice:</strong>{' '}
+            {getSupabaseConfigError() || 'Supabase credentials are not configured in .env.'}
+            <div style={{ marginTop: '0.35rem', fontSize: '0.8rem', color: '#1e3a8a' }}>
+              Set <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> (or <code>VITE_SUPABASE_PUBLISHABLE_KEY</code>) in your root <code>.env</code> file, then restart Vite.
+            </div>
+          </div>
+        </div>
+      )}
 
       {submitError && (
         <div
