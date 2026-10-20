@@ -1,39 +1,24 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import {
-  env,
-  isSupabaseConfigured,
-  getSupabaseConfigError,
-  getSupabaseConfigStatus,
-} from './env';
+import { env, isSupabaseConfigured } from './env';
 
 let supabaseClient: SupabaseClient | null = null;
 
 export const getSupabaseClient = (): SupabaseClient => {
   if (!supabaseClient) {
-    if (isSupabaseConfigured()) {
-      supabaseClient = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY, {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true,
-        },
-      });
-    } else {
-      // Safe non-routable unconfigured client so top-level imports do not crash
-      // the application at module evaluation time. Operations are guarded by isSupabaseConfigured().
-      supabaseClient = createClient('http://127.0.0.1:54321', 'missing-configuration-key', {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false,
-        },
-      });
-    }
+    const url = env.VITE_SUPABASE_URL || 'https://placeholder-project.supabase.co';
+    const key = env.VITE_SUPABASE_ANON_KEY || 'placeholder-anon-key';
+
+    supabaseClient = createClient(url, key, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+    });
   }
 
   return supabaseClient;
 };
 
 export const supabase = getSupabaseClient();
-export { isSupabaseConfigured, getSupabaseConfigError, getSupabaseConfigStatus };
-
+export { isSupabaseConfigured };

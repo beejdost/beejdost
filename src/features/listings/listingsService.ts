@@ -397,22 +397,19 @@ export async function fetchListings(
 export async function fetchListingById(id: string): Promise<SeedListing | null> {
   if (!id) return null;
 
-  const foundLocal = INITIAL_SEED_LOTS.find((l) => l.id === id);
-  if (foundLocal) {
+  if (!isSupabaseConfigured()) {
+    const found = INITIAL_SEED_LOTS.find((l) => l.id === id);
+    if (!found) return null;
     return {
-      ...foundLocal,
-      title: foundLocal.varietyName,
+      ...found,
+      title: found.varietyName,
       seedCondition: 'cleaned' as SeedCondition,
-      listingType: (foundLocal.pricePerKg === 0 ? 'exchange' : 'sale') as ListingType,
+      listingType: (found.pricePerKg === 0 ? 'exchange' : 'sale') as ListingType,
       status: 'active' as ListingStatus,
       claimedCertified: false,
       isVerifiedCertified: false,
-      updatedAt: foundLocal.createdAt,
+      updatedAt: found.createdAt,
     };
-  }
-
-  if (!isSupabaseConfigured()) {
-    return null;
   }
 
   try {

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase, isSupabaseConfigured, getSupabaseConfigError } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { UserProfile, PakistanProvince, FarmingType, PreferredLanguage } from '@/types';
 import i18n from '@/i18n/config';
 
@@ -182,10 +182,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = useCallback(async (data: SignUpData): Promise<{ error: Error | null; unconfirmed: boolean }> => {
     if (!isSupabaseConfigured()) {
       return {
-        error: new Error(
-          getSupabaseConfigError() ||
-            'Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env'
-        ),
+        error: new Error('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env'),
         unconfirmed: false,
       };
     }
@@ -235,9 +232,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   ): Promise<{ error: Error | null; requiresEmailConfirmation?: boolean; isSuspended?: boolean }> => {
     if (!isSupabaseConfigured()) {
       return {
-        error: new Error(
-          getSupabaseConfigError() || 'Supabase credentials are not configured in .env.'
-        ),
+        error: new Error('Supabase credentials are not configured in .env.'),
       };
     }
 

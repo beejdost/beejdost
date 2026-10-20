@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isSupabaseConfigured, getSupabaseConfigError, env } from '@/lib/env';
+import { isSupabaseConfigured, env } from '@/lib/env';
 import { INITIAL_SEED_LOTS } from '../listings/seedData';
 import {
   ShieldCheck,
@@ -15,7 +15,6 @@ import {
 export const AdminPage: FC = () => {
   const { t } = useTranslation();
   const configured = isSupabaseConfigured();
-  const configError = getSupabaseConfigError();
 
   return (
     <div className="container" style={{ paddingTop: '2rem', paddingBottom: '3.5rem' }}>
@@ -81,11 +80,6 @@ export const AdminPage: FC = () => {
             <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
               Target: {env.VITE_SUPABASE_URL || 'Not specified'}
             </div>
-            {!configured && configError && (
-              <div style={{ fontSize: '0.8rem', color: '#b45309', marginTop: '0.2rem' }}>
-                {configError}
-              </div>
-            )}
           </div>
         </div>
 
